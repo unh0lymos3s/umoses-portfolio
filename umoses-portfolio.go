@@ -21,7 +21,9 @@ const (
 )
 
 func main() {
+	//initialStack := []string{"Go", "Rust", "Python"}
 	p:= tea.NewProgram(initialModel())
+	
 	if _, err := p.Run(); err !=nil {
 		fmt.Printf("There been an error %v", err)
 		os.Exit(1)
@@ -43,8 +45,14 @@ type home struct {
 func initialModel() home {
 	return home{
 		items: []string{"Stack", "Projects", "Experience", "Contact"},
-
+		stack: initialStack(),
 		selected: make(map[int]struct{}),
+	}
+}
+
+func initialStack() stack {
+	return stack{
+		languages: []string{"1","2","3"},
 	}
 }
 
@@ -54,7 +62,20 @@ func (m home) Init() tea.Cmd {
 }
 //update home
 func (m home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	//var cmd tea.Cmd
+	switch m.state{
+	case stackView:
+		updatedStack, cmd := m.stack.Update(msg)
+		m.stack = updatedStack.(stack)
+		return m,cmd
+	}
+
+
+	///                                                                            Im gonna kill myself :p
+//it looked easy when i started it lol
 	switch msg := msg.(type) {
+	
+
 	case tea.WindowSizeMsg:
 		m.width = msg.Width
 		m.height = msg.Height
@@ -83,16 +104,13 @@ func (m home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 
-	var cmd tea.Cmd
-	switch m.state {
-	case stackView:
-			m.stack, cmd = m.stack.Update(msg)
-	}
-	return m, nil
+	
+}
+return m,nil
 }
 
 //view home
-func (m home) View() string {
+func (m home) View() string{
 	
 	homepageString := `
                                                                                                                                           
@@ -141,16 +159,16 @@ type stack struct{
 
 
 //Initialize Stack
-func (s stack) Init (tea.Cmd) {
+func (s stack) Init() tea.Cmd{
 	return nil
 }
 
 
 //Updaate stack
-func (s stack) Update(msg tea.Msg) (tea.Msg, tea.Cmd){
+func (s stack) Update(msg tea.Msg) (tea.Model, tea.Cmd){
 
 	switch msg := msg.(type){
-	case msg.KeyMsg:
+	case tea.KeyMsg:
 		switch msg.String(){
 		case "q":
 			return s, tea.Quit
