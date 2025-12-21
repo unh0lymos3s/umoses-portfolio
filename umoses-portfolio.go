@@ -44,6 +44,7 @@ type home struct {
 
 func initialModel() home {
 	return home{
+		state: homeView,
 		items: []string{"Stack", "Projects", "Experience", "Contact"},
 		stack: initialStack(),
 		selected: make(map[int]struct{}),
@@ -63,13 +64,6 @@ func (m home) Init() tea.Cmd {
 //update home
 func (m home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	//var cmd tea.Cmd
-	switch m.state{
-	case stackView:
-		updatedStack, cmd := m.stack.Update(msg)
-		m.stack = updatedStack.(stack)
-		return m,cmd
-	}
-
 
 	///                                                                            Im gonna kill myself :p
 //it looked easy when i started it lol
@@ -102,16 +96,42 @@ func (m home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "s":
 			m.state = stackView
 		}
+		
+	}
+	switch m.state{
+	case stackView:
+		updatedStack, cmd := m.stack.Update(msg)
+		m.stack = updatedStack.(stack)
+		
+		switch msg:= msg.(type){
+		case tea.KeyMsg:
+			switch msg.String(){
+			case "h":
+				m.state = homeView
+
+		}
+		return m,cmd
+	}
 
 
-	
-}
-return m,nil
+	}
+	return m,nil
 }
 
 //view home
 func (m home) View() string{
+	switch m.state{
+	case homeView:
+		return m.homeView()
 	
+	case stackView:
+		return m.stack.View()
+	}
+	return "unknown"
+}
+
+//helper function to view homepage
+func (m home) homeView() string{
 	homepageString := `
                                                                                                                                           
                              *                  ***                         *****   **    **                                              
