@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 	tea "github.com/charmbracelet/bubbletea"
-//	gloss "github.com/charmbracelet/lipgloss"
+ 	"github.com/charmbracelet/lipgloss"
 //	wish "github.com/charmbracelet/wish"
 //	bubbles "github.com/charmbracelet/bubbles"
 //	harmonica "github.com/charmbracelet/harmonica"
@@ -30,7 +30,18 @@ func main() {
 	}
 }
 
+type Styles struct{
+	Title	lipgloss.Style
+}
+
+func DefaultStyles() *Styles{
+	s:= new(Styles)
+	s.Title = lipgloss.NewStyle().BorderForeground(lipgloss.Color("9")).BorderStyle(lipgloss.DoubleBorder()).Padding(1).Align(lipgloss.Center, lipgloss.Center).Bold(true).Background(lipgloss.Color("239")).Foreground(lipgloss.Color("195"))
+	return s
+}
+
 type home struct {
+	styles	*Styles
 	state	sessionState
 	items   []string
 	cursor   int
@@ -48,6 +59,7 @@ func initialModel() home {
 		items: []string{"Stack", "Projects", "Experience", "Contact"},
 		stack: initialStack(),
 		selected: make(map[int]struct{}),
+		styles: DefaultStyles(),
 	}
 }
 
@@ -57,16 +69,13 @@ func initialStack() stack {
 	}
 }
 
+
 //initialize home
 func (m home) Init() tea.Cmd {
 	return nil
 }
 //update home
 func (m home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	//var cmd tea.Cmd
-
-	///                                                                            Im gonna kill myself :p
-//it looked easy when i started it lol
 	switch msg := msg.(type) {
 	
 
@@ -77,22 +86,6 @@ func (m home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg.String() {
 		case "q":
 			return m, tea.Quit
-		case "up":
-			if m.cursor > 0 {
-				m.cursor--
-			}
-		case "down":
-			if m.cursor <= len(m.items)-1 {
-				m.cursor++
-			}
-
-		case "enter", " ":
-			_, ok := m.selected[m.cursor]
-			if ok {
-				delete(m.selected, m.cursor)
-			} else {
-				m.selected[m.cursor] = struct{}{}
-			}
 		case "s":
 			m.state = stackView
 		}
@@ -132,45 +125,26 @@ func (m home) View() string{
 
 //helper function to view homepage
 func (m home) homeView() string{
-	homepageString := `
-                                                                                                                                          
-                             *                  ***                         *****   **    **                                              
-                           **                    ***                     ******  ***** *****                                              
-                           **                     **                    **   *  *  ***** *****                                            
-                           **                     **                   *    *  *   * **  * **                                             
-**   ****                  **           ****      **    **   ****          *  *    *     *        ****       ****                 ****    
- **    ***  * ***  ****    **  ***     * ***  *   **     **    ***  *     ** **    *     *       * ***  *   * **** *    ***      * **** * 
- **     ****   **** **** * ** * ***   *   ****    **     **     ****      ** **    *     *      *   ****   **  ****    * ***    **  ****  
- **      **     **   ****  ***   *** **    **     **     **      **       ** **    *     *     **    **   ****        *   ***  ****       
- **      **     **    **   **     ** **    **     **     **      **       ** **    *     *     **    **     ***      **    ***   ***      
- **      **     **    **   **     ** **    **     **     **      **       ** **    *     **    **    **       ***    ********      ***    
- **      **     **    **   **     ** **    **     **     **      **       *  **    *     **    **    **         ***  *******         ***  
- **      **     **    **   **     ** **    **     **     **      **          *     *      **   **    **    ****  **  **         ****  **  
-  ******* **    **    **   **     **  ******      **      *********      ****      *      **    ******    * **** *   ****    * * **** *   
-   *****   **   ***   ***  **     **   ****       *** *     **** ***    *  *****           **    ****        ****     *******     ****    
-                 ***   ***  **    **               ***            ***  *     **                                        *****              
-                                  *                        *****   *** *                                                                  
-                                 *                       ********  **   **                                                                
-                                *                       *      ****                                                                       
-                               *                                                                                                          
-                                                                                                                                          
-
-`	
-	for i, item := range m.items{
-		cursor := " "
-			if m.cursor == i{
-			cursor = ">"
-			}
-
-		checked := " "
-			if _, ok := m.selected[i]; ok {
-			checked = "X"
-		  }
-
-		homepageString += fmt.Sprintf("%s [%s] %s\n", cursor, checked,item)
-		}
+	homepageString:=`███    █▄  ███▄▄▄▄      ▄█    █▄     ▄██████▄   ▄█       ▄██   ▄     ▄▄▄▄███▄▄▄▄    ▄██████▄     ▄████████    ▄████████    ▄████████ 
+███    ███ ███▀▀▀██▄   ███    ███   ███    ███ ███       ███   ██▄ ▄██▀▀▀███▀▀▀██▄ ███    ███   ███    ███   ███    ███   ███    ███ 
+███    ███ ███   ███   ███    ███   ███    ███ ███       ███▄▄▄███ ███   ███   ███ ███    ███   ███    █▀    ███    █▀    ███    █▀  
+███    ███ ███   ███  ▄███▄▄▄▄███▄▄ ███    ███ ███       ▀▀▀▀▀▀███ ███   ███   ███ ███    ███   ███         ▄███▄▄▄       ███        
+███    ███ ███   ███ ▀▀███▀▀▀▀███▀  ███    ███ ███       ▄██   ███ ███   ███   ███ ███    ███ ▀███████████ ▀▀███▀▀▀     ▀███████████ 
+███    ███ ███   ███   ███    ███   ███    ███ ███       ███   ███ ███   ███   ███ ███    ███          ███   ███    █▄           ███ 
+███    ███ ███   ███   ███    ███   ███    ███ ███▌    ▄ ███   ███ ███   ███   ███ ███    ███    ▄█    ███   ███    ███    ▄█    ███ 
+████████▀   ▀█   █▀    ███    █▀     ▀██████▀  █████▄▄██  ▀█████▀   ▀█   ███   █▀   ▀██████▀   ▄████████▀    ██████████  ▄████████▀  
+                                               ▀                                                                                     `
+	// add terminal hyperlinks
+	homepageString+= "\n\n"
+	homepageString+= "\n\n[A] About\n\n[S] Stack\n\n[E] Experience\n\n[P] Projects\n\n[R] Resume\n\n\n"	
 	homepageString+= "\n Press Q to quit."
-	return homepageString
+	return lipgloss.Place(
+		m.width,
+		m.height,
+		lipgloss.Center, 
+		lipgloss.Center,
+		m.styles.Title.Width(m.width - 2).Height(m.height-3).Render(homepageString),
+	)
 }
 //struct for Stack info
 type stack struct{
@@ -199,7 +173,8 @@ func (s stack) Update(msg tea.Msg) (tea.Model, tea.Cmd){
 
 // ViewStack
 func (s stack) View() string{
-	stackString:= "My stack basically comprises of Python, Rust, Go and C/C++, However, I would classify my strongest suite as python"
+
+	stackString:= "I am really interested in backend development along with TUIs and AI so my tech stack is rather simple"
 
 	return stackString
 }
