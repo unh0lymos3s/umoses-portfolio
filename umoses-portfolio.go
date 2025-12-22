@@ -32,11 +32,14 @@ func main() {
 
 type Styles struct{
 	Title	lipgloss.Style
+	StackStyle lipgloss.Style
 }
 
 func DefaultStyles() *Styles{
 	s:= new(Styles)
 	s.Title = lipgloss.NewStyle().BorderForeground(lipgloss.Color("9")).BorderStyle(lipgloss.DoubleBorder()).Padding(1).Align(lipgloss.Center, lipgloss.Center).Bold(true).Background(lipgloss.Color("239")).Foreground(lipgloss.Color("195"))
+	s.StackStyle = lipgloss.NewStyle().BorderForeground(lipgloss.Color("9")).BorderStyle(lipgloss.DoubleBorder()).Padding(1).Align(lipgloss.Center, lipgloss.Center).Bold(true).Background(lipgloss.Color("239")).Foreground(lipgloss.Color("195"))
+	
 	return s
 }
 
@@ -66,6 +69,7 @@ func initialModel() home {
 func initialStack() stack {
 	return stack{
 		languages: []string{"1","2","3"},
+		styles: DefaultStyles(),		
 	}
 }
 
@@ -148,7 +152,10 @@ func (m home) homeView() string{
 }
 //struct for Stack info
 type stack struct{
+	width int
+	height int
 	languages []string
+	styles *Styles
 }
 
 
@@ -160,14 +167,18 @@ func (s stack) Init() tea.Cmd{
 
 //Updaate stack
 func (s stack) Update(msg tea.Msg) (tea.Model, tea.Cmd){
-
+	
 	switch msg := msg.(type){
 	case tea.KeyMsg:
 		switch msg.String(){
 		case "q":
 			return s, tea.Quit
 		}
+	case tea.WindowSizeMsg:
+		s.width = msg.Width
+		s.height = msg.Height
 	}
+
 	return s,nil
 }
 
@@ -175,6 +186,14 @@ func (s stack) Update(msg tea.Msg) (tea.Model, tea.Cmd){
 func (s stack) View() string{
 
 	stackString:= "I am really interested in backend development along with TUIs and AI so my tech stack is rather simple"
+	stackString+= "\n\n\n [Q] Quit  |  [H] Home"
 
-	return stackString
+	return lipgloss.Place(
+		s.width,
+		s.height,
+		lipgloss.Center,
+		lipgloss.Center,
+		s.styles.StackStyle.Width(s.width-2).Height(s.height-3).Render(stackString),
+
+	)
 }
