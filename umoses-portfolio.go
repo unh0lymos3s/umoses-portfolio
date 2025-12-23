@@ -33,13 +33,18 @@ func main() {
 type Styles struct{
 	Title	lipgloss.Style
 	StackStyle lipgloss.Style
+	hyperLinks lipgloss.Style
+	homeBodyText lipgloss.Style
+	stackLogo	lipgloss.Style
 }
 
 func DefaultStyles() *Styles{
 	s:= new(Styles)
-	s.Title = lipgloss.NewStyle().BorderForeground(lipgloss.Color("9")).BorderStyle(lipgloss.DoubleBorder()).Padding(1).Align(lipgloss.Center, lipgloss.Center).Bold(true).Background(lipgloss.Color("239")).Foreground(lipgloss.Color("195"))
-	s.StackStyle = lipgloss.NewStyle().BorderForeground(lipgloss.Color("9")).BorderStyle(lipgloss.DoubleBorder()).Padding(1).Align(lipgloss.Center, lipgloss.Center).Bold(true).Background(lipgloss.Color("239")).Foreground(lipgloss.Color("195"))
-	
+	s.Title = lipgloss.NewStyle().BorderForeground(lipgloss.Color("9")).Padding(1).MarginBottom(-2).Align(lipgloss.Center, lipgloss.Center).Bold(true).Foreground(lipgloss.Color("195"))
+	s.StackStyle = lipgloss.NewStyle().BorderForeground(lipgloss.Color("9")).Padding(1).Align(lipgloss.Center, lipgloss.Top).Bold(true).Foreground(lipgloss.Color("195"))
+	s.hyperLinks = lipgloss.NewStyle().Underline(true)
+	s.homeBodyText = lipgloss.NewStyle().Bold(true).Align(lipgloss.Center, lipgloss.Center).Padding(1)
+	s.stackLogo = lipgloss.NewStyle().Align(lipgloss.Left, lipgloss.Center).Padding(1)	
 	return s
 }
 
@@ -86,6 +91,8 @@ func (m home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		m.width = msg.Width
 		m.height = msg.Height
+		m.stack.width = msg.Width
+		m.stack.height = msg.Height
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "q":
@@ -129,7 +136,7 @@ func (m home) View() string{
 
 //helper function to view homepage
 func (m home) homeView() string{
-	homepageString:=`███    █▄  ███▄▄▄▄      ▄█    █▄     ▄██████▄   ▄█       ▄██   ▄     ▄▄▄▄███▄▄▄▄    ▄██████▄     ▄████████    ▄████████    ▄████████ 
+	homepageStringTitle:=`███    █▄  ███▄▄▄▄      ▄█    █▄     ▄██████▄   ▄█       ▄██   ▄     ▄▄▄▄███▄▄▄▄    ▄██████▄     ▄████████    ▄████████    ▄████████ 
 ███    ███ ███▀▀▀██▄   ███    ███   ███    ███ ███       ███   ██▄ ▄██▀▀▀███▀▀▀██▄ ███    ███   ███    ███   ███    ███   ███    ███ 
 ███    ███ ███   ███   ███    ███   ███    ███ ███       ███▄▄▄███ ███   ███   ███ ███    ███   ███    █▀    ███    █▀    ███    █▀  
 ███    ███ ███   ███  ▄███▄▄▄▄███▄▄ ███    ███ ███       ▀▀▀▀▀▀███ ███   ███   ███ ███    ███   ███         ▄███▄▄▄       ███        
@@ -139,15 +146,24 @@ func (m home) homeView() string{
 ████████▀   ▀█   █▀    ███    █▀     ▀██████▀  █████▄▄██  ▀█████▀   ▀█   ███   █▀   ▀██████▀   ▄████████▀    ██████████  ▄████████▀  
                                                ▀                                                                                     `
 	// add terminal hyperlinks
-	homepageString+= "\n\n"
-	homepageString+= "\n\n[A] About\n\n[S] Stack\n\n[E] Experience\n\n[P] Projects\n\n[R] Resume\n\n\n"	
+	homepageString:= ""
+	GitUrl:= "https://github.com/unh0lymos3s"
+	GitText:= "Github"
+	homepageString+= fmt.Sprintf("\x1b]8;;%s\x1b\\%s\x1b]8;;\x1b\\ ", GitUrl, GitText)
+	lnkdinUrl := "https://linkedin.com/in/moosabinnaseem"
+	lnkdinText := "LinkedIn"
+	homepageString+= fmt.Sprintf("\t | \t \x1b]8;;%s\x1b\\%s\x1b]8;;\x1b\\", lnkdinUrl, lnkdinText)
+	//homepageString+=fmt.Sprintf("%s", gitLink)
+	homepageString+= "\n\n\n[A] About\t|\t[S] Stack\t|\t[R] Resume\t|\t[P] Projects\t|\t[E] Experience\n\n\n"	
 	homepageString+= "\n Press Q to quit."
+	homePageStringTitleRendered := m.styles.Title.Align(lipgloss.Center, lipgloss.Center).Render(homepageStringTitle)
 	return lipgloss.Place(
 		m.width,
 		m.height,
 		lipgloss.Center, 
 		lipgloss.Center,
-		m.styles.Title.Width(m.width - 2).Height(m.height-3).Render(homepageString),
+		lipgloss.JoinVertical(lipgloss.Center, homePageStringTitleRendered,
+		m.styles.homeBodyText.Render(homepageString)),
 	)
 }
 //struct for Stack info
@@ -184,16 +200,29 @@ func (s stack) Update(msg tea.Msg) (tea.Model, tea.Cmd){
 
 // ViewStack
 func (s stack) View() string{
-
-	stackString:= "I am really interested in backend development along with TUIs and AI so my tech stack is rather simple"
-	stackString+= "\n\n\n [Q] Quit  |  [H] Home"
-
+	stackStringTitle:= `    ███        ▄████████  ▄████████    ▄█    █▄            ▄████████     ███        ▄████████  ▄████████    ▄█   ▄█▄ 
+▀█████████▄   ███    ███ ███    ███   ███    ███          ███    ███ ▀█████████▄   ███    ███ ███    ███   ███ ▄███▀ 
+   ▀███▀▀██   ███    █▀  ███    █▀    ███    ███          ███    █▀     ▀███▀▀██   ███    ███ ███    █▀    ███▐██▀   
+    ███   ▀  ▄███▄▄▄     ███         ▄███▄▄▄▄███▄▄        ███            ███   ▀   ███    ███ ███         ▄█████▀    
+    ███     ▀▀███▀▀▀     ███        ▀▀███▀▀▀▀███▀       ▀███████████     ███     ▀███████████ ███        ▀▀█████▄    
+    ███       ███    █▄  ███    █▄    ███    ███                 ███     ███       ███    ███ ███    █▄    ███▐██▄   
+    ███       ███    ███ ███    ███   ███    ███           ▄█    ███     ███       ███    ███ ███    ███   ███ ▀███▄ 
+   ▄████▀     ██████████ ████████▀    ███    █▀          ▄████████▀     ▄████▀     ███    █▀  ████████▀    ███   ▀█▀ 
+                                                                                                           ▀         `
+	stackStringRust :=`Rust`
+	stackStringPython:= `Python`
+	stackStringGo:=`Go`
+	stackStringBody:= "I've been working with Machine Learning and Data Science for almost 2 years now, so Python is my daily driver. Having some backend experience with Node.JS and Flask, I have started to hack away at Rust and GO as I transition more into systems programming and HPC; currently building Pherrous (A distributed network computing system written purely in rust) and this portfolio using Go and Bubbletea framework."
+	stackStringBody+= "\n\n\n [Q] Quit  |  [H] Home"
+	rustRendered:= s.styles.stackLogo.Render(stackStringRust,stackStringPython,stackStringGo)
+	titleRendered:= s.styles.StackStyle.Width(s.width  - 2).Render(stackStringTitle)
+	stackBody:= s.styles.homeBodyText.Width(s.width-4).Render(stackStringBody)
 	return lipgloss.Place(
 		s.width,
 		s.height,
 		lipgloss.Center,
 		lipgloss.Center,
-		s.styles.StackStyle.Width(s.width-2).Height(s.height-3).Render(stackString),
+		lipgloss.JoinVertical( lipgloss.Center, titleRendered, rustRendered, stackBody),
 
 	)
 }
