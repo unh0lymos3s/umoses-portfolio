@@ -209,20 +209,42 @@ func (s stack) View() string{
     ███       ███    ███ ███    ███   ███    ███           ▄█    ███     ███       ███    ███ ███    ███   ███ ▀███▄ 
    ▄████▀     ██████████ ████████▀    ███    █▀          ▄████████▀     ▄████▀     ███    █▀  ████████▀    ███   ▀█▀ 
                                                                                                            ▀         `
-	stackStringRust :=`Rust`
-	stackStringPython:= `Python`
-	stackStringGo:=`Go`
+	stackStringRust :=`██████╗ ██╗   ██╗███████╗████████╗
+██╔══██╗██║   ██║██╔════╝╚══██╔══╝
+██████╔╝██║   ██║███████╗   ██║   
+██╔══██╗██║   ██║╚════██║   ██║   
+██║  ██║╚██████╔╝███████║   ██║   
+╚═╝  ╚═╝ ╚═════╝ ╚══════╝   ╚═╝   
+                                  `
+	stackStringPython:= `██████╗ ██╗   ██╗████████╗██╗  ██╗ ██████╗ ███╗   ██╗
+██╔══██╗╚██╗ ██╔╝╚══██╔══╝██║  ██║██╔═══██╗████╗  ██║
+██████╔╝ ╚████╔╝    ██║   ███████║██║   ██║██╔██╗ ██║
+██╔═══╝   ╚██╔╝     ██║   ██╔══██║██║   ██║██║╚██╗██║
+██║        ██║      ██║   ██║  ██║╚██████╔╝██║ ╚████║
+╚═╝        ╚═╝      ╚═╝   ╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═══╝
+                                                     `
+	stackStringGo:=` ██████╗  ██████╗ 
+██╔════╝ ██╔═══██╗
+██║  ███╗██║   ██║
+██║   ██║██║   ██║
+╚██████╔╝╚██████╔╝
+ ╚═════╝  ╚═════╝ 
+                  `
+	pipe:= `  ██  `
+	padding:="\n\n\n\n"
 	stackStringBody:= "I've been working with Machine Learning and Data Science for almost 2 years now, so Python is my daily driver. Having some backend experience with Node.JS and Flask, I have started to hack away at Rust and GO as I transition more into systems programming and HPC; currently building Pherrous (A distributed network computing system written purely in rust) and this portfolio using Go and Bubbletea framework."
 	stackStringBody+= "\n\n\n [Q] Quit  |  [H] Home"
-	rustRendered:= s.styles.stackLogo.Render(stackStringRust,stackStringPython,stackStringGo)
+	rustRendered:= s.styles.stackLogo.Foreground(lipgloss.Color("#E97451")).Render(stackStringRust)
+	pyRendered:= s.styles.stackLogo.Render(stackStringPython)
+	goRendered:= s.styles.stackLogo.Foreground(lipgloss.Color("#2596be")).Render(stackStringGo)
 	titleRendered:= s.styles.StackStyle.Width(s.width  - 2).Render(stackStringTitle)
 	stackBody:= s.styles.homeBodyText.Width(s.width-4).Render(stackStringBody)
 	return lipgloss.Place(
 		s.width,
 		s.height,
 		lipgloss.Center,
-		lipgloss.Center,
-		lipgloss.JoinVertical( lipgloss.Center, titleRendered, rustRendered, stackBody),
+		lipgloss.Top,
+		lipgloss.JoinVertical( lipgloss.Center, titleRendered,padding, lipgloss.JoinHorizontal(lipgloss.Center, rustRendered,pipe,pyRendered,pipe,goRendered), stackBody),
 
 	)
 }
