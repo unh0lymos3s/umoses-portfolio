@@ -136,7 +136,7 @@ func (m home) View() string{
 
 //helper function to view homepage
 func (m home) homeView() string{
-	homepageStringTitle:=`███    █▄  ███▄▄▄▄      ▄█    █▄     ▄██████▄   ▄█       ▄██   ▄     ▄▄▄▄███▄▄▄▄    ▄██████▄     ▄████████    ▄████████    ▄████████ 
+/*	homepageStringTitle:=`███    █▄  ███▄▄▄▄      ▄█    █▄     ▄██████▄   ▄█       ▄██   ▄     ▄▄▄▄███▄▄▄▄    ▄██████▄     ▄████████    ▄████████    ▄████████ 
 ███    ███ ███▀▀▀██▄   ███    ███   ███    ███ ███       ███   ██▄ ▄██▀▀▀███▀▀▀██▄ ███    ███   ███    ███   ███    ███   ███    ███ 
 ███    ███ ███   ███   ███    ███   ███    ███ ███       ███▄▄▄███ ███   ███   ███ ███    ███   ███    █▀    ███    █▀    ███    █▀  
 ███    ███ ███   ███  ▄███▄▄▄▄███▄▄ ███    ███ ███       ▀▀▀▀▀▀███ ███   ███   ███ ███    ███   ███         ▄███▄▄▄       ███        
@@ -144,15 +144,22 @@ func (m home) homeView() string{
 ███    ███ ███   ███   ███    ███   ███    ███ ███       ███   ███ ███   ███   ███ ███    ███          ███   ███    █▄           ███ 
 ███    ███ ███   ███   ███    ███   ███    ███ ███▌    ▄ ███   ███ ███   ███   ███ ███    ███    ▄█    ███   ███    ███    ▄█    ███ 
 ████████▀   ▀█   █▀    ███    █▀     ▀██████▀  █████▄▄██  ▀█████▀   ▀█   ███   █▀   ▀██████▀   ▄████████▀    ██████████  ▄████████▀  
-                                               ▀                                                                                     `
+                                               ▀                                                                                     `*/
+	homepageStringTitle:=`    ┓   ┓           
+┓┏┏┓┣┓┏┓┃┓┏┏┳┓┏┓┏┏┓┏
+┗┻┛┗┛┗┗┛┗┗┫┛┗┗┗┛┛┗ ┛
+          ┛         `
 	// add terminal hyperlinks
 	homepageString:= ""
 	GitUrl:= "https://github.com/unh0lymos3s"
-	GitText:= "Github"
+	GitText:= " Github"
 	homepageString+= fmt.Sprintf("\x1b]8;;%s\x1b\\%s\x1b]8;;\x1b\\ ", GitUrl, GitText)
 	lnkdinUrl := "https://linkedin.com/in/moosabinnaseem"
-	lnkdinText := "LinkedIn"
+	lnkdinText := " LinkedIn"
 	homepageString+= fmt.Sprintf("\t | \t \x1b]8;;%s\x1b\\%s\x1b]8;;\x1b\\", lnkdinUrl, lnkdinText)
+	hfUrl := "https://huggingface.co/Moosa01"
+	hfText := "\U0001F917 HuggingFace"
+	homepageString+= fmt.Sprintf("\t | \t \x1b]8;;%s\x1b\\%s\x1b]8;;\x1b\\", hfUrl, hfText)
 	//homepageString+=fmt.Sprintf("%s", gitLink)
 	homepageString+= "\n\n\n[A] About\t|\t[S] Stack\t|\t[R] Resume\t|\t[P] Projects\t|\t[E] Experience\n\n\n"	
 	homepageString+= "\n Press Q to quit."
