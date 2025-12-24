@@ -36,12 +36,14 @@ type Styles struct{
 	hyperLinks lipgloss.Style
 	homeBodyText lipgloss.Style
 	stackLogo	lipgloss.Style
+	pyt lipgloss.Style
+	hon lipgloss.Style
 }
 
 func DefaultStyles() *Styles{
 	s:= new(Styles)
-	s.Title = lipgloss.NewStyle().BorderForeground(lipgloss.Color("9")).Padding(1).MarginBottom(-2).Align(lipgloss.Center, lipgloss.Center).Bold(true).Foreground(lipgloss.Color("195"))
-	s.StackStyle = lipgloss.NewStyle().BorderForeground(lipgloss.Color("9")).Padding(1).Align(lipgloss.Center, lipgloss.Top).Bold(true).Foreground(lipgloss.Color("195"))
+	s.Title = lipgloss.NewStyle().Padding(1).MarginBottom(-2).Align(lipgloss.Center, lipgloss.Center).Bold(true).Foreground(lipgloss.AdaptiveColor{Light:"#000000", Dark:"#09FF00"})
+	s.StackStyle = lipgloss.NewStyle().BorderForeground(lipgloss.Color("9")).Padding(1).Align(lipgloss.Center, lipgloss.Top).Bold(true).Foreground(lipgloss.AdaptiveColor{Light:"#000000", Dark:"#09FF00"})
 	s.hyperLinks = lipgloss.NewStyle().Underline(true)
 	s.homeBodyText = lipgloss.NewStyle().Bold(true).Align(lipgloss.Center, lipgloss.Center).Padding(1)
 	s.stackLogo = lipgloss.NewStyle().Align(lipgloss.Left, lipgloss.Center).Padding(1)	
@@ -145,10 +147,16 @@ func (m home) homeView() string{
 ███    ███ ███   ███   ███    ███   ███    ███ ███▌    ▄ ███   ███ ███   ███   ███ ███    ███    ▄█    ███   ███    ███    ▄█    ███ 
 ████████▀   ▀█   █▀    ███    █▀     ▀██████▀  █████▄▄██  ▀█████▀   ▀█   ███   █▀   ▀██████▀   ▄████████▀    ██████████  ▄████████▀  
                                                ▀                                                                                     `*/
-	homepageStringTitle:=`    ┓   ┓           
-┓┏┏┓┣┓┏┓┃┓┏┏┳┓┏┓┏┏┓┏
-┗┻┛┗┛┗┗┛┗┗┫┛┗┗┗┛┛┗ ┛
-          ┛         `
+	homepageStringTitle:=`         _               _______ _               _______ _______ _______ ______  _______ 
+|\     /( (    /|\     /(  __   | \  |\     /|  (       |  ___  |  ____ Y ___  \(  ____ \
+| )   ( |  \  ( | )   ( | (  )  | (  ( \   / )  | () () | (   ) | (    \|/   \  \ (    \/
+| |   | |   \ | | (___) | | /   | |   \ (_) /   | || || | |   | | (_____   ___) / (_____ 
+| |   | | (\ \) |  ___  | (/ /) | |    \   /    | |(_)| | |   | (_____  ) (___ ((_____  )
+| |   | | | \   | (   ) |   / | | |     ) (     | |   | | |   | |     ) |     ) \     ) |
+| (___) | )  \  | )   ( |  (__) | (____/\ |     | )   ( | (___) /\____) /\___/  /\____) |
+(_______)/    )_)/     \(_______|_______|_/     |/     \(_______)_______)______/\_______)
+                                                                                         `
+
 	// add terminal hyperlinks
 	homepageString:= ""
 	GitUrl:= "https://github.com/unh0lymos3s"
@@ -207,15 +215,15 @@ func (s stack) Update(msg tea.Msg) (tea.Model, tea.Cmd){
 
 // ViewStack
 func (s stack) View() string{
-	stackStringTitle:= `    ███        ▄████████  ▄████████    ▄█    █▄            ▄████████     ███        ▄████████  ▄████████    ▄█   ▄█▄ 
-▀█████████▄   ███    ███ ███    ███   ███    ███          ███    ███ ▀█████████▄   ███    ███ ███    ███   ███ ▄███▀ 
-   ▀███▀▀██   ███    █▀  ███    █▀    ███    ███          ███    █▀     ▀███▀▀██   ███    ███ ███    █▀    ███▐██▀   
-    ███   ▀  ▄███▄▄▄     ███         ▄███▄▄▄▄███▄▄        ███            ███   ▀   ███    ███ ███         ▄█████▀    
-    ███     ▀▀███▀▀▀     ███        ▀▀███▀▀▀▀███▀       ▀███████████     ███     ▀███████████ ███        ▀▀█████▄    
-    ███       ███    █▄  ███    █▄    ███    ███                 ███     ███       ███    ███ ███    █▄    ███▐██▄   
-    ███       ███    ███ ███    ███   ███    ███           ▄█    ███     ███       ███    ███ ███    ███   ███ ▀███▄ 
-   ▄████▀     ██████████ ████████▀    ███    █▀          ▄████████▀     ▄████▀     ███    █▀  ████████▀    ███   ▀█▀ 
-                                                                                                           ▀         `
+	stackStringTitle:= `_______________  _______            _______________________ _______ _       
+\__   __/ ___  \(  ____ \\     /|  (  ____ \__   __(  ___  |  ____ \ \    /\
+   ) (  \/   \  \ (    \/ )   ( |  | (    \/  ) (  | (   ) | (    \/  \  / /
+   | |     ___) / |     | (___) |  | (_____   | |  | (___) | |     |  (_/ / 
+   | |    (___ (| |     |  ___  |  (_____  )  | |  |  ___  | |     |   _ (  
+   | |        ) \ |     | (   ) |        ) |  | |  | (   ) | |     |  ( \ \ 
+   | |  /\___/  / (____/\ )   ( |  /\____) |  | |  | )   ( | (____/\  /  \ \
+   )_(  \______/(_______//     \|  \_______)  )_(  |/     \(_______/_/    \/
+                                                                            `
 	stackStringRust :=`██████╗ ██╗   ██╗███████╗████████╗
 ██╔══██╗██║   ██║██╔════╝╚══██╔══╝
 ██████╔╝██║   ██║███████╗   ██║   
@@ -223,13 +231,20 @@ func (s stack) View() string{
 ██║  ██║╚██████╔╝███████║   ██║   
 ╚═╝  ╚═╝ ╚═════╝ ╚══════╝   ╚═╝   
                                   `
-	stackStringPython:= `██████╗ ██╗   ██╗████████╗██╗  ██╗ ██████╗ ███╗   ██╗
-██╔══██╗╚██╗ ██╔╝╚══██╔══╝██║  ██║██╔═══██╗████╗  ██║
-██████╔╝ ╚████╔╝    ██║   ███████║██║   ██║██╔██╗ ██║
-██╔═══╝   ╚██╔╝     ██║   ██╔══██║██║   ██║██║╚██╗██║
-██║        ██║      ██║   ██║  ██║╚██████╔╝██║ ╚████║
-╚═╝        ╚═╝      ╚═╝   ╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═══╝
-                                                     `
+	stackStringPyt:= `██████╗ ██╗   ██╗████████╗
+██╔══██╗╚██╗ ██╔╝╚══██╔══╝
+██████╔╝ ╚████╔╝    ██║   
+██╔═══╝   ╚██╔╝     ██║   
+██║        ██║      ██║   
+╚═╝        ╚═╝      ╚═╝   
+                          `
+	stackStringHon:= `██╗  ██╗ ██████╗ ███╗   ██╗
+██║  ██║██╔═══██╗████╗  ██║
+███████║██║   ██║██╔██╗ ██║
+██╔══██║██║   ██║██║╚██╗██║
+██║  ██║╚██████╔╝██║ ╚████║
+╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═══╝
+                           `
 	stackStringGo:=` ██████╗  ██████╗ 
 ██╔════╝ ██╔═══██╗
 ██║  ███╗██║   ██║
@@ -242,7 +257,8 @@ func (s stack) View() string{
 	stackStringBody:= "I've been working with Machine Learning and Data Science for almost 2 years now, so Python is my daily driver. Having some backend experience with Node.JS and Flask, I have started to hack away at Rust and GO as I transition more into systems programming and HPC; currently building Pherrous (A distributed network computing system written purely in rust) and this portfolio using Go and Bubbletea framework."
 	stackStringBody+= "\n\n\n [Q] Quit  |  [H] Home"
 	rustRendered:= s.styles.stackLogo.Foreground(lipgloss.Color("#E97451")).Render(stackStringRust)
-	pyRendered:= s.styles.stackLogo.Render(stackStringPython)
+	pytRendered:= s.styles.stackLogo.Foreground(lipgloss.Color("#2596be")).Render(stackStringPyt)
+	honRendered:= s.styles.stackLogo.Foreground(lipgloss.Color("#fec008")).PaddingLeft(-1).Render(stackStringHon)
 	goRendered:= s.styles.stackLogo.Foreground(lipgloss.Color("#2596be")).Render(stackStringGo)
 	titleRendered:= s.styles.StackStyle.Width(s.width  - 2).Render(stackStringTitle)
 	stackBody:= s.styles.homeBodyText.Width(s.width-4).Render(stackStringBody)
@@ -251,7 +267,7 @@ func (s stack) View() string{
 		s.height,
 		lipgloss.Center,
 		lipgloss.Top,
-		lipgloss.JoinVertical( lipgloss.Center, titleRendered,padding, lipgloss.JoinHorizontal(lipgloss.Center, rustRendered,pipe,pyRendered,pipe,goRendered), stackBody),
+		lipgloss.JoinVertical( lipgloss.Center, titleRendered,padding, lipgloss.JoinHorizontal(lipgloss.Center, rustRendered,pipe,pytRendered,honRendered,pipe,goRendered), stackBody),
 
 	)
 }
