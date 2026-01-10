@@ -5,7 +5,7 @@ import (
 	"os"
 	tea "github.com/charmbracelet/bubbletea"
  	"github.com/charmbracelet/lipgloss"
-//	wish "github.com/charmbracelet/wish"
+//	"github.com/charmbracelet/glamour"
 //	bubbles "github.com/charmbracelet/bubbles"
 //	harmonica "github.com/charmbracelet/harmonica"
 )
@@ -14,7 +14,7 @@ type sessionState int
 const (
 	homeView sessionState = iota
 	stackView
-//	aboutView
+	aboutView
 //	projsNexpView 
 	host = "0.0.0.0"
 	port = 23234
@@ -38,15 +38,19 @@ type Styles struct{
 	stackLogo	lipgloss.Style
 	pyt lipgloss.Style
 	hon lipgloss.Style
+	stackBodyText lipgloss.Style
+	aboutBody lipgloss.Style
 }
 
 func DefaultStyles() *Styles{
 	s:= new(Styles)
-	s.Title = lipgloss.NewStyle().Padding(1).MarginBottom(-2).Align(lipgloss.Center, lipgloss.Center).Bold(true).Foreground(lipgloss.AdaptiveColor{Light:"#000000", Dark:"#09FF00"})
-	s.StackStyle = lipgloss.NewStyle().BorderForeground(lipgloss.Color("9")).Padding(1).Align(lipgloss.Center, lipgloss.Top).Bold(true).Foreground(lipgloss.AdaptiveColor{Light:"#000000", Dark:"#09FF00"})
+	s.Title = lipgloss.NewStyle().Padding(1).MarginBottom(-2).Align(lipgloss.Center, lipgloss.Center).Bold(true).Foreground(lipgloss.AdaptiveColor{Light:"#1c9305", Dark:"#09FF00"})
+	s.StackStyle = lipgloss.NewStyle().BorderForeground(lipgloss.Color("9")).Padding(1).Align(lipgloss.Center, lipgloss.Top).Bold(true).Foreground(lipgloss.AdaptiveColor{Light:"#a0a2a0", Dark:"#555954"})
 	s.hyperLinks = lipgloss.NewStyle().Underline(true)
 	s.homeBodyText = lipgloss.NewStyle().Bold(true).Align(lipgloss.Center, lipgloss.Center).Padding(1)
+	s.stackBodyText = lipgloss.NewStyle().Bold(true).Align(lipgloss.Center, lipgloss.Center).Padding(1).MarginLeft(3).MarginRight(3)
 	s.stackLogo = lipgloss.NewStyle().Align(lipgloss.Left, lipgloss.Center).Padding(1)	
+	s.aboutBody = lipgloss.NewStyle()
 	return s
 }
 
@@ -57,6 +61,7 @@ type home struct {
 	cursor   int
 	selected map[int]struct{}
 	stack		stack
+	about	about
 	width int 
 	height int
 }
@@ -73,13 +78,21 @@ func initialModel() home {
 	}
 }
 
+
+
+
 func initialStack() stack {
 	return stack{
-		languages: []string{"1","2","3"},
+		//languages: []string{"1","2","3"},
 		styles: DefaultStyles(),		
 	}
 }
 
+func initialAbout() about{
+	return about{
+		styles: DefaultStyles(),
+	}
+}
 
 //initialize home
 func (m home) Init() tea.Cmd {
@@ -101,6 +114,8 @@ func (m home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 		case "s":
 			m.state = stackView
+		case "a":
+			m.state = aboutView
 		}
 		
 	}
@@ -116,10 +131,21 @@ func (m home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.state = homeView
 
 		}
+
 		return m,cmd
 	}
+	case aboutView:
+		updatedAbout,cmd := m.about.Update(msg)
+		m.about =  updatedAbout.(about)
 
-
+		switch msg := msg.(type){
+		case tea.KeyMsg:
+			switch msg.String(){
+			case "h":
+				m.state = homeView
+			}
+		}
+		return m, cmd
 	}
 	return m,nil
 }
@@ -261,7 +287,7 @@ func (s stack) View() string{
 	honRendered:= s.styles.stackLogo.Foreground(lipgloss.Color("#fec008")).PaddingLeft(-1).Render(stackStringHon)
 	goRendered:= s.styles.stackLogo.Foreground(lipgloss.Color("#2596be")).Render(stackStringGo)
 	titleRendered:= s.styles.StackStyle.Width(s.width  - 2).Render(stackStringTitle)
-	stackBody:= s.styles.homeBodyText.Width(s.width-4).Render(stackStringBody)
+	stackBody:= s.styles.stackBodyText.Width(s.width-5).Render(stackStringBody)
 	return lipgloss.Place(
 		s.width,
 		s.height,
@@ -269,5 +295,46 @@ func (s stack) View() string{
 		lipgloss.Top,
 		lipgloss.JoinVertical( lipgloss.Center, titleRendered,padding, lipgloss.JoinHorizontal(lipgloss.Center, rustRendered,pipe,pytRendered,honRendered,pipe,goRendered), stackBody),
 
+	)
+}
+
+
+type about struct{
+	styles *Styles
+	state sessionState
+	about []string
+	width int
+	height int
+}
+
+func (a about) Init() tea.Cmd{
+	return nil
+}
+
+func (a about) Update(msg tea.Msg) (tea.Model, tea.Cmd){
+	
+	switch msg := msg.(type){
+	case tea.KeyMsg:
+		switch msg.String(){
+		case "q":
+			return a, tea.Quit
+		}
+	case tea.WindowSizeMsg:
+		a.width = msg.Width
+		a.height = msg.Height
+	}
+
+	return a,nil
+}
+
+func (a about) View() string{
+	aboutString:= `skjdfsdljkfsn`
+	abtRendered:= a.styles.aboutBody.Render(aboutString)
+	return lipgloss.Place(
+		a.height,
+		a.width,
+		lipgloss.Center,
+		lipgloss.Top,
+		abtRendered,
 	)
 }
