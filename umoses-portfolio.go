@@ -73,6 +73,7 @@ func initialModel() home {
 		state: homeView,
 		items: []string{"Stack", "Projects", "Experience", "Contact"},
 		stack: initialStack(),
+		about: initialAbout(),
 		selected: make(map[int]struct{}),
 		styles: DefaultStyles(),
 	}
@@ -158,6 +159,9 @@ func (m home) View() string{
 	
 	case stackView:
 		return m.stack.View()
+	
+	case aboutView:
+		return m.about.View()
 	}
 	return "unknown"
 }
@@ -328,13 +332,24 @@ func (a about) Update(msg tea.Msg) (tea.Model, tea.Cmd){
 }
 
 func (a about) View() string{
-	aboutString:= `skjdfsdljkfsn`
-	abtRendered:= a.styles.aboutBody.Render(aboutString)
+	aboutTitle:= ` _______  ______   _______          _________
+(  ___  )(  ___ \ (  ___  )|\     /|\__   __/
+| (   ) || (   ) )| (   ) || )   ( |   ) (   
+| (___) || (__/ / | |   | || |   | |   | |   
+|  ___  ||  __ (  | |   | || |   | |   | |   
+| (   ) || (  \ \ | |   | || |   | |   | |   
+| )   ( || )___) )| (___) || (___) |   | |   
+|/     \||/ \___/ (_______)(_______)   )_(   
+                                             `
+	aboutTitleRendered:= a.styles.StackStyle.Width(a.width-2).Render(aboutTitle)
+
+	aboutBody:= `Jupyter notebooks = `
+	aboutBodyRendered:= a.styles.aboutBody.Render(aboutBody)
 	return lipgloss.Place(
-		a.height,
 		a.width,
+		a.height,
 		lipgloss.Center,
 		lipgloss.Top,
-		abtRendered,
+		lipgloss.JoinVertical(lipgloss.Left,aboutTitleRendered, aboutBodyRendered ),
 	)
 }

@@ -1,0 +1,27 @@
+type stack struct {
+	languages []string
+	
+}
+// Initializing stack page
+func initialModel() stack{
+	return stack{
+		langs: string{"Python", "C/C++", "Rust", "Go"}
+	}
+}
+
+func (stck stack) Init() tea.Cmd{
+	return nil
+}
+
+func (stck stack) Update(msg. tea.Msg) (tea.Model, tea.Cmd){
+	switch msg := msg.(type){
+	case tea.Msg:
+		switch msg.String(){
+		case "q":
+			return stck, tea.Quit
+		case "h":
+			return stck, bubblon.Open(home.New())
+		}
+	}
+}
+
