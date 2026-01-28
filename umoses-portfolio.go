@@ -109,6 +109,8 @@ func (m home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.height = msg.Height
 		m.stack.width = msg.Width
 		m.stack.height = msg.Height
+		m.about.width =msg.Width
+		m.about.height=msg.Height
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "q":
@@ -168,15 +170,6 @@ func (m home) View() string{
 
 //helper function to view homepage
 func (m home) homeView() string{
-/*	homepageStringTitle:=`███    █▄  ███▄▄▄▄      ▄█    █▄     ▄██████▄   ▄█       ▄██   ▄     ▄▄▄▄███▄▄▄▄    ▄██████▄     ▄████████    ▄████████    ▄████████ 
-███    ███ ███▀▀▀██▄   ███    ███   ███    ███ ███       ███   ██▄ ▄██▀▀▀███▀▀▀██▄ ███    ███   ███    ███   ███    ███   ███    ███ 
-███    ███ ███   ███   ███    ███   ███    ███ ███       ███▄▄▄███ ███   ███   ███ ███    ███   ███    █▀    ███    █▀    ███    █▀  
-███    ███ ███   ███  ▄███▄▄▄▄███▄▄ ███    ███ ███       ▀▀▀▀▀▀███ ███   ███   ███ ███    ███   ███         ▄███▄▄▄       ███        
-███    ███ ███   ███ ▀▀███▀▀▀▀███▀  ███    ███ ███       ▄██   ███ ███   ███   ███ ███    ███ ▀███████████ ▀▀███▀▀▀     ▀███████████ 
-███    ███ ███   ███   ███    ███   ███    ███ ███       ███   ███ ███   ███   ███ ███    ███          ███   ███    █▄           ███ 
-███    ███ ███   ███   ███    ███   ███    ███ ███▌    ▄ ███   ███ ███   ███   ███ ███    ███    ▄█    ███   ███    ███    ▄█    ███ 
-████████▀   ▀█   █▀    ███    █▀     ▀██████▀  █████▄▄██  ▀█████▀   ▀█   ███   █▀   ▀██████▀   ▄████████▀    ██████████  ▄████████▀  
-                                               ▀                                                                                     `*/
 	homepageStringTitle:=`         _               _______ _               _______ _______ _______ ______  _______ 
 |\     /( (    /|\     /(  __   | \  |\     /|  (       |  ___  |  ____ Y ___  \(  ____ \
 | )   ( |  \  ( | )   ( | (  )  | (  ( \   / )  | () () | (   ) | (    \|/   \  \ (    \/
@@ -341,15 +334,15 @@ func (a about) View() string{
 | )   ( || )___) )| (___) || (___) |   | |   
 |/     \||/ \___/ (_______)(_______)   )_(   
                                              `
-	aboutTitleRendered:= a.styles.StackStyle.Width(a.width-2).Render(aboutTitle)
-
-	aboutBody:= `Jupyter notebooks = `
-	aboutBodyRendered:= a.styles.aboutBody.Render(aboutBody)
+	aboutTitleRendered:= a.styles.StackStyle.Align(lipgloss.Center,lipgloss.Center).Render(aboutTitle)
+	padding := "\n\n\n\n"
+	aboutBody:= `Crazy? I was crazy once`
+	aboutBodyRendered:= a.styles.aboutBody.Width(0).Render(aboutBody)
 	return lipgloss.Place(
 		a.width,
 		a.height,
 		lipgloss.Center,
-		lipgloss.Top,
-		lipgloss.JoinVertical(lipgloss.Left,aboutTitleRendered, aboutBodyRendered ),
+		lipgloss.Center,
+		lipgloss.JoinVertical(lipgloss.Center, aboutTitleRendered,padding, aboutBodyRendered ),
 	)
 }
