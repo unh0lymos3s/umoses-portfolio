@@ -290,8 +290,7 @@ func (s stack) View() string {
 	goRendered := s.styles.stackLogo.Foreground(lipgloss.Color("#2596be")).Render(stackStringGo)
 	titleRendered := s.styles.StackStyle.Width(s.width - 2).Render(stackStringTitle)
 	stackBody := s.styles.stackBodyText.Width(s.width - 5).Render(stackStringBody)
-	stackMDRender := s.styles.stackBodyText.Render(s.renderedMD)
-
+	stackMDRender := s.styles.stackBodyText.Width(s.width -4).Render(s.renderedMD)
 	stackPageNav := "\n\n\n [Q] Quit  |  [H] Home"
 	navRender := s.styles.stackBodyText.Render(stackPageNav)
 	return lipgloss.Place(
@@ -390,7 +389,7 @@ func readStackMD(filename string) string {
 
 	}
 
-	r, err := glamour.NewTermRenderer(glamour.WithEnvironmentConfig())
+	r, err := glamour.NewTermRenderer(glamour.WithEnvironmentConfig(), glamour.WithWordWrap(120),)
 	if err != nil {
 		fmt.Printf("Fatal Error while Rendering")
 
