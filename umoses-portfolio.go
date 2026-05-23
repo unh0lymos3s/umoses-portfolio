@@ -55,7 +55,7 @@ func DefaultStyles() *Styles {
 	s.homeBodyText = lipgloss.NewStyle().Bold(true).Align(lipgloss.Center, lipgloss.Center).Padding(1)
 	s.stackBodyText = lipgloss.NewStyle().Bold(true).Align(lipgloss.Center, lipgloss.Center).Padding(1).MarginLeft(3).MarginRight(3)
 	s.stackLogo = lipgloss.NewStyle().Align(lipgloss.Left, lipgloss.Center).Padding(1)
-	s.aboutBody = lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "#1c9305", Dark: "#09FF00"})
+	s.aboutBody = lipgloss.NewStyle()//.Foreground(lipgloss.AdaptiveColor{Light: "#1c9305", Dark: "#09FF00"})
 	s.aboutStrings = lipgloss.NewStyle()
 	return s
 }
@@ -325,6 +325,7 @@ func (a about) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		a.width = msg.Width
 		a.height = msg.Height
+		
 	}
 
 	return a, nil
@@ -341,24 +342,37 @@ func (a about) View() string {
 |/     \||/ \___/ (_______)(_______)   )_(   
                                              `
 	aboutTitleRendered := a.styles.StackStyle.Align(lipgloss.Top, lipgloss.Center).Render(aboutTitle)
-	aboutString1 := "I am a mediocre engineer, a full time nerd and an aspiring Netrunner in-\n the upcoming dystopian future (Drones in the battlefield? come on!); The things that get my tism riled up are: \n\t> Computer Science and Math \n\t> AI? (Love hate relationship; It can be really cool but then there's people like Elon Musk) \n\t> Military (History, Strategy, Aviation) \n\t> Fighter Jets \n\t> Martial Arts \n\t Privacy, Security \n I absolutely love Decentralized infrastructure, RF stuff, hardware tinkering and\nstanding against Mass-Surveillance, breach of rights, Data thiefs and merchants. (Honorable mention: I Despise developing frontend, TUIs are fine)"
+	aboutString1 := "Engineer, Nerd, Fighter, "
 	aboutString1Rendered:= a.styles.aboutStrings.Width(0).Render(aboutString1)
 	//padding := "\n"
-	aboutBody := ` ________                          ________                     __              
-/        |                        /        |                   /  |             
-$$$$$$$$/__    __  _______        $$$$$$$$/______    _______  _$$ |_    _______ 
-$$ |__  /  |  /  |/       \       $$ |__  /      \  /       |/ $$   |  /       |
-$$    | $$ |  $$ |$$$$$$$  |      $$    | $$$$$$  |/$$$$$$$/ $$$$$$/  /$$$$$$$/ 
-$$$$$/  $$ |  $$ |$$ |  $$ |      $$$$$/  /    $$ |$$ |        $$ | __$$      \ 
-$$ |    $$ \__$$ |$$ |  $$ |      $$ |   /$$$$$$$ |$$ \_____   $$ |/  |$$$$$$  |
-$$ |    $$    $$/ $$ |  $$ |      $$ |   $$    $$ |$$       |  $$  $$//     $$/ 
-$$/      $$$$$$/  $$/   $$/       $$/     $$$$$$$/  $$$$$$$/    $$$$/ $$$$$$$/  
-                                                                                
-                                                                                
-                                                                                `
-	aboutBodyRendered := a.styles.aboutBody.Width(0).Render(aboutBody)
-	aboutString2:= "\t> I sometimes read \n\t> I genuinely enjoy coding in Rust \n\t> I have trained and studied 9 different styles of Martial Arts (Started when I was like 4 progressed on & off) \n\t> Even with all that training I'm still bad at grappling \n\t> I once got shot at \n\t> I don't cook often but when I do its good \n\t> I got a cat named Enzo (^.w.^) "
-	aboutString2Rendered := a.styles.aboutStrings.Width(0).Render(aboutString2)
+	aboutPhoto := `KK00K000000000OOOOOOOOOkkkkkkkxxxxkxxxxxxxxxxxxddddollc:::;:
+0KK000000000OOOOOOOOOkkkkxxxxxxxxxxxxxxdddddoooolllc:::;;,,,
+KKK00000000OOOOOOOOOOkkkkxxxxxxxddddooollcc::;;,,'''''''''..
+KK000000000OOOOOOkkkkkkkxxdddddoollcc:;;,,''''''''.'''',,''.
+0000000000OOOOkkkkxxxxdddollcccc:;,''............'',,,,,;;;;
+000000OOOOOkkkkxxxxddollc:;;,,'.................'',,;:clllll
+0000OOOOkkkxxxddolcc:;,,'''................',,;;:cclooddxddo
+00OOOOkkxxdolc:;;;,'...............'',,,;;::ccclllllodxxkkxd
+0OOkkxxddol:;,,'''...'''''''''''.......'''',;::::coddxxkOOkx
+Okkxxdolcc;;;;;;;,,;;,,''................... ....',;codkkOOk
+kkxxddollcc::::cccc:;,'........  ...;coooolc:,.....';:ldkOOk
+kkxxddooooooooolc:;'........;;..  ..l0XXNXXK0kol:;,',;ldkOO0
+kkxxxdddddddolc:;,,'......         .,xO0XXNXXOolclodxk0KXXKK
+OOkkkxxxxddoc::::cooc,.....       ..lk0KXNXKOolcodxk0XXNNXXK
+OOOOkkxxdolcc::loxxxxdc;''..    .'cx0KKXXXKkollldk0KNNNNNNXK
+000OOkkxol:;;;:clddxxxxxdlc:;;:lxk00KKKK0kocccoO0XXNNNNNNNNK
+KK00Okxoc;''''',;;:clodddddddddxkOOOkxol::;cckOKXNNNNNNNNNN0
+XKK0Okxolcc::::;;;;:::::cccccccccccc:;;,;:coxXNNNNNWWWWWWNNO
+XXXK0Oxooolllclccccccc:::;;;;,,,,,;;;;:odOKXKXNNNNWWWWWWWNNd
+NNXXK0Oxdoooollllcccccc:ccccccclllodxkkO0XXNNNNNWWWWWWWWWWXl
+NNNNXK00OxddooooolllllllllloodddxxkO00KKXXNNNNNNWWWWWWWWWNK;
+NNNNNNXXK00kxxxdddooooooddddxxkkOO00KKKXXXNNNNNNWWWWWWWWWNk,
+NNNNNNNNXXK00OkkxxxxxxxxxxxxkkOO00KKKKXXXNNNNNNNNWWWWWWWWNo'
+`
+
+aboutPhotoRendered := a.styles.aboutBody.Width(0).Render(aboutPhoto)
+//	aboutString2:= "\t> I sometimes read \n\t>  "
+//	aboutString2Rendered := a.styles.aboutStrings.Width(0).Render(aboutString2)
 	aboutNav:= "[Q] Quit | [H] Home"
 	aboutNavRendered:= a.styles.aboutStrings.Render(aboutNav)
 	return lipgloss.Place(
@@ -366,7 +380,7 @@ $$/      $$$$$$/  $$/   $$/       $$/     $$$$$$$/  $$$$$$$/    $$$$/ $$$$$$$/
 		a.height,
 		lipgloss.Center,
 		lipgloss.Top,
-		lipgloss.JoinVertical(lipgloss.Center, aboutTitleRendered,aboutString1Rendered, aboutBodyRendered,aboutString2Rendered, aboutNavRendered),
+		lipgloss.JoinVertical(lipgloss.Center, aboutTitleRendered,lipgloss.JoinHorizontal(lipgloss.Center,aboutPhotoRendered, aboutString1Rendered),aboutNavRendered),
 	)
 }
 
