@@ -19,6 +19,7 @@ const (
 	homeView sessionState = iota
 	stackView
 	aboutView
+	resumeView
 	//	projsNexpView
 	host = "0.0.0.0"
 	port = 23234
@@ -45,6 +46,7 @@ type Styles struct {
 	stackBodyText lipgloss.Style
 	aboutBody     lipgloss.Style
 	aboutStrings 	lipgloss.Style
+	aboutPhotoStyle	lipgloss.Style
 }
 
 func DefaultStyles() *Styles {
@@ -57,6 +59,7 @@ func DefaultStyles() *Styles {
 	s.stackLogo = lipgloss.NewStyle().Align(lipgloss.Left, lipgloss.Center).Padding(1)
 	s.aboutBody = lipgloss.NewStyle()//.Foreground(lipgloss.AdaptiveColor{Light: "#1c9305", Dark: "#09FF00"})
 	s.aboutStrings = lipgloss.NewStyle()
+	s.aboutPhotoStyle = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.AdaptiveColor{Light: "#6df04a", Dark: "#6df04a"})
 	return s
 }
 
@@ -68,6 +71,7 @@ type home struct {
 	selected map[int]struct{}
 	stack    stack
 	about    about
+	resume	 resume
 	width    int
 	height   int
 }
@@ -78,6 +82,7 @@ func initialModel() home {
 		items:    []string{"Stack", "Projects", "Experience", "Contact"},
 		stack:    initialStack(),
 		about:    initialAbout(),
+		resume:	  initialResume(),
 		selected: make(map[int]struct{}),
 		styles:   DefaultStyles(),
 	}
@@ -94,6 +99,13 @@ func initialStack() stack {
 func initialAbout() about {
 	return about{
 		styles: DefaultStyles(),
+	}
+}
+
+func initialResume() resume{
+	return resume{
+		styles: DefaultStyles(),
+		resumeRenderer: readStackMD("Resume.md"),
 	}
 }
 
@@ -121,6 +133,8 @@ func (m home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.state = stackView
 		case "a":
 			m.state = aboutView
+		case "r":
+			m.state = resumeView
 		}
 
 	}
@@ -154,6 +168,17 @@ func (m home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		updatedAbout, cmd := m.about.Update(msg)
 		m.about = updatedAbout.(about)
 		return m, cmd
+	
+	
+	case resumeView:
+		switch msg := msg.(type){
+		case tea.KeyMsg:
+			switch msg.String(){
+			case "h":
+				m.state = homeView
+				return m, nil
+			}
+		}
 	}
 	return m, nil
 }
@@ -342,35 +367,41 @@ func (a about) View() string {
 |/     \||/ \___/ (_______)(_______)   )_(   
                                              `
 	aboutTitleRendered := a.styles.StackStyle.Align(lipgloss.Top, lipgloss.Center).Render(aboutTitle)
-	aboutString1 := "Engineer, Nerd, Fighter, "
+	aboutString1 := `
+	1x Engineer, 5x Nerd, 10x Fighter
+	Trying to survive this cyberpunk era;
+	one line of code at a time :p
+	My Interests include:
+	* Distributed Systems
+	* Privacy Engineering
+	* Application Security
+	* RF Hacking
+	* Martial Arts`
 	aboutString1Rendered:= a.styles.aboutStrings.Width(0).Render(aboutString1)
 	//padding := "\n"
-	aboutPhoto := `KK00K000000000OOOOOOOOOkkkkkkkxxxxkxxxxxxxxxxxxddddollc:::;:
-0KK000000000OOOOOOOOOkkkkxxxxxxxxxxxxxxdddddoooolllc:::;;,,,
-KKK00000000OOOOOOOOOOkkkkxxxxxxxddddooollcc::;;,,'''''''''..
-KK000000000OOOOOOkkkkkkkxxdddddoollcc:;;,,''''''''.'''',,''.
-0000000000OOOOkkkkxxxxdddollcccc:;,''............'',,,,,;;;;
-000000OOOOOkkkkxxxxddollc:;;,,'.................'',,;:clllll
-0000OOOOkkkxxxddolcc:;,,'''................',,;;:cclooddxddo
-00OOOOkkxxdolc:;;;,'...............'',,,;;::ccclllllodxxkkxd
-0OOkkxxddol:;,,'''...'''''''''''.......'''',;::::coddxxkOOkx
-Okkxxdolcc;;;;;;;,,;;,,''................... ....',;codkkOOk
-kkxxddollcc::::cccc:;,'........  ...;coooolc:,.....';:ldkOOk
-kkxxddooooooooolc:;'........;;..  ..l0XXNXXK0kol:;,',;ldkOO0
-kkxxxdddddddolc:;,,'......         .,xO0XXNXXOolclodxk0KXXKK
-OOkkkxxxxddoc::::cooc,.....       ..lk0KXNXKOolcodxk0XXNNXXK
-OOOOkkxxdolcc::loxxxxdc;''..    .'cx0KKXXXKkollldk0KNNNNNNXK
-000OOkkxol:;;;:clddxxxxxdlc:;;:lxk00KKKK0kocccoO0XXNNNNNNNNK
-KK00Okxoc;''''',;;:clodddddddddxkOOOkxol::;cckOKXNNNNNNNNNN0
-XKK0Okxolcc::::;;;;:::::cccccccccccc:;;,;:coxXNNNNNWWWWWWNNO
-XXXK0Oxooolllclccccccc:::;;;;,,,,,;;;;:odOKXKXNNNNWWWWWWWNNd
-NNXXK0Oxdoooollllcccccc:ccccccclllodxkkO0XXNNNNNWWWWWWWWWWXl
-NNNNXK00OxddooooolllllllllloodddxxkO00KKXXNNNNNNWWWWWWWWWNK;
-NNNNNNXXK00kxxxdddooooooddddxxkkOO00KKKXXXNNNNNNWWWWWWWWWNk,
-NNNNNNNNXXK00OkkxxxxxxxxxxxxkkOO00KKKKXXXNNNNNNNNWWWWWWWWNo'
+	aboutPhoto := `                                        
+                                        
+                   c.                   
+          ..,;:cloxO;                   
+          .cdc.   ,Oc                   
+             .cc;.lOl                   
+            .,cc,.lOd                   
+          .okl.   dOx                   
+            .,lxolkOk                   
+                .ckOOl'                 
+                 .dOd:dkd:.             
+                 .dO:   .;okl,          
+                  oO.  .;odl;.          
+                  lk .oOo.              
+                  :o   .co,             
+                  ';      'c,           
+                             '.         
+                                        
+                                        
+                                        
 `
 
-aboutPhotoRendered := a.styles.aboutBody.Width(0).Render(aboutPhoto)
+aboutPhotoRendered := a.styles.aboutPhotoStyle.Width(0).Render(aboutPhoto)
 //	aboutString2:= "\t> I sometimes read \n\t>  "
 //	aboutString2Rendered := a.styles.aboutStrings.Width(0).Render(aboutString2)
 	aboutNav:= "[Q] Quit | [H] Home"
@@ -384,12 +415,82 @@ aboutPhotoRendered := a.styles.aboutBody.Width(0).Render(aboutPhoto)
 	)
 }
 
+
+type resume struct{
+	width      int
+	height     int
+	res  []string
+	styles     *Styles
+	resumeRenderer string
+
+}
+
+func (r resume) Init() tea.Cmd{
+	return nil
+}
+
+func (r resume) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+
+	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		switch msg.String() {
+		case "q":
+			return r, tea.Quit
+		}
+	case tea.WindowSizeMsg:
+		r.width = msg.Width
+		r.height = msg.Height
+		
+	}
+
+	return r, nil
+}
+
+
+func (r resume) View() string{
+	//resumeString:=
+
+	resumeMDRender := r.styles.stackBodyText.Width(r.width -4).Render(r.resumeRenderer)
+	stackPageNav := "\n\n\n [Q] Quit  |  [H] Home"
+	navRender := r.styles.stackBodyText.Render(stackPageNav)
+	return lipgloss.Place(
+		r.width,
+		r.height,
+		lipgloss.Center,
+		lipgloss.Top,
+		lipgloss.JoinVertical(lipgloss.Center, resumeMDRender, navRender),
+	)
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 //go:embed Stack.md
 var f embed.FS
 
 func readStackMD(filename string) string {
 
-	f, err := f.Open("Stack.md")
+	f, err := f.Open(filename)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Unable to open file %s/n", err)
 		return ""
