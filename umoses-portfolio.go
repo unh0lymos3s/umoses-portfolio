@@ -21,6 +21,7 @@ const (
 	aboutView
 	resumeView
 	projView
+	expView
 	//	projsNexpView
 	host = "0.0.0.0"
 	port = 23234
@@ -74,6 +75,7 @@ type home struct {
 	about    about
 	resume   resume
 	proj     proj
+	exp	 exp
 	width    int
 	height   int
 }
@@ -86,6 +88,7 @@ func initialModel() home {
 		about:    initialAbout(),
 		resume:  initialResume(),
 		proj:    initialProj(),
+		exp:	 initialExp(),
 		selected: make(map[int]struct{}),
 		styles:   DefaultStyles(),
 	}
@@ -119,6 +122,13 @@ func initialProj() proj{
 	}
 }
 
+func initialExp() exp{
+	return exp{
+		styles: DefaultStyles(),
+		expRenderer: readStackMD("Exp.md"),
+	}
+}
+
 // initialize home
 func (m home) Init() tea.Cmd {
 	return nil
@@ -135,6 +145,10 @@ func (m home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.stack.height = msg.Height
 		m.about.width = msg.Width
 		m.about.height = msg.Height
+		m.proj.width = msg.Width
+		m.proj.height = msg.Height
+		m.exp.width = msg.Width
+		m.exp.height = msg.Height
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "q":
@@ -147,6 +161,8 @@ func (m home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.state = resumeView
 		case "p":
 			m.state = projView
+		case "e":
+			m.state = expView
 		}
 
 	}
@@ -199,31 +215,47 @@ func (m home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.state = homeView
 				return m, nil
 			}
+			}
+
+		updatedProj, cmd := m.proj.Update(msg)
+		m.proj = updatedProj.(proj)
+		return m,cmd
+	case expView:
+		switch msg := msg.(type){
+		case tea.KeyMsg:
+			switch msg.String(){
+			case "h":
+				m.state = homeView
+				return m,nil
+			}
 		}
 	}
 	return m, nil
-}
-
-// view home
-func (m home) View() string {
-	switch m.state {
-	case homeView:
-		return m.homeView()
-
-	case stackView:
-		return m.stack.View()
-
-	case aboutView:
-		return m.about.View()
-	
-	case resumeView:
-		return m.resume.View()
-	
-	case projView:
-		return m.proj.View()
 	}
 
-		return "unknown"
+// view home
+func (m home) View() string{
+	switch m.state {
+		case homeView:
+			return m.homeView()
+
+		case stackView:
+			return m.stack.View()
+
+		case aboutView:
+			return m.about.View()
+	
+		case resumeView:
+			return m.resume.View()
+	
+		case projView:
+			return m.proj.View()
+
+		case expView:
+			return m.exp.View()
+	}
+
+	return "unknown"
 }
 
 // helper function to view homepage
@@ -251,7 +283,7 @@ func (m home) homeView() string {
 	homepageString += fmt.Sprintf("\t | \t \x1b]8;;%s\x1b\\%s\x1b]8;;\x1b\\", hfUrl, hfText)
 	//homepageString+=fmt.Sprintf("%s", gitLink)
 	homepageString += "\n\n\n[A] About\t|\t[S] Stack\t|\t[R] Resume\t|\t[P] Projects\t|\t[E] Experience\n\n\n"
-	homepageString += "\n Press Q to quit."
+	homepageString += "\n Press Q to quit. \n\n\n\n\n\n (Open the terminal in fullscreen for a better experience)"
 	homePageStringTitleRendered := m.styles.Title.Align(lipgloss.Center, lipgloss.Center).Render(homepageStringTitle)
 	return lipgloss.Place(
 		m.width,
@@ -296,15 +328,12 @@ func (s stack) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 // ViewStack
 func (s stack) View() string {
-	stackStringTitle := `_______________  _______            _______________________ _______ _       
-\__   __/ ___  \(  ____ \\     /|  (  ____ \__   __(  ___  |  ____ \ \    /\
-   ) (  \/   \  \ (    \/ )   ( |  | (    \/  ) (  | (   ) | (    \/  \  / /
-   | |     ___) / |     | (___) |  | (_____   | |  | (___) | |     |  (_/ / 
-   | |    (___ (| |     |  ___  |  (_____  )  | |  |  ___  | |     |   _ (  
-   | |        ) \ |     | (   ) |        ) |  | |  | (   ) | |     |  ( \ \ 
-   | |  /\___/  / (____/\ )   ( |  /\____) |  | |  | )   ( | (____/\  /  \ \
-   )_(  \______/(_______//     \|  \_______)  )_(  |/     \(_______/_/    \/
-                                                                            `
+	stackStringTitle := ` _____          _       __ _             _    
+/__   \___  ___| |__   / _\ |_ __ _  ___| | __
+  / /\/ _ \/ __| '_ \  \ \| __/ _' |/ __| |/ /
+ / / |  __/ (__| | | | _\ \ || (_| | (__|   < 
+ \/   \___|\___|_| |_| \__/\__\__,_|\___|_|\_\
+                                              `
 	stackStringRust := `__________                __   
 \______   \__ __  _______/  |_ 
  |       _/  |  \/  ___/\   __\
@@ -344,7 +373,7 @@ func (s stack) View() string {
 	goRendered := s.styles.stackLogo.Foreground(lipgloss.Color("#2596be")).Render(stackStringGo)
 	titleRendered := s.styles.StackStyle.Width(s.width - 2).Render(stackStringTitle)
 	stackBody := s.styles.stackBodyText.Width(s.width - 5).Render(stackStringBody)
-	stackMDRender := s.styles.stackBodyText.Width(s.width -4).Render(s.renderedMD)
+	stackMDRender := s.styles.stackBodyText.Width(s.width - 4).Render(s.renderedMD)
 	stackPageNav := "\n\n\n [Q] Quit  |  [H] Home"
 	navRender := s.styles.stackBodyText.Render(stackPageNav)
 	return lipgloss.Place(
@@ -386,15 +415,12 @@ func (a about) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (a about) View() string {
-	aboutTitle := ` _______  ______   _______          _________   _______  _______ 
-(  ___  )(  ___ \ (  ___  )|\     /|\__   __/  (       )(  ____ \
-| (   ) || (   ) )| (   ) || )   ( |   ) (     | () () || (    \/
-| (___) || (__/ / | |   | || |   | |   | |     | || || || (__    
-|  ___  ||  __ (  | |   | || |   | |   | |     | |(_)| ||  __)   
-| (   ) || (  \ \ | |   | || |   | |   | |     | |   | || (      
-| )   ( || )___) )| (___) || (___) |   | |     | )   ( || (____/\
-|/     \||/ \___/ (_______)(_______)   )_(     |/     \|(_______/
-                                                                 `
+	aboutTitle := `   _   _                 _               __ 
+  /_\ | |__   ___  _   _| |_    /\/\    /__\
+ //_\\| '_ \ / _ \| | | | __|  /    \  /_\  
+/  _  \ |_) | (_) | |_| | |_  / /\/\ \//__  
+\_/ \_/_.__/ \___/ \__,_|\__| \/    \/\__/  
+                                            `
 	aboutTitleRendered := a.styles.StackStyle.Align(lipgloss.Top, lipgloss.Center).Render(aboutTitle)
 	aboutString1 := `
 	1x Engineer, 5x Nerd, 10x Fighter
@@ -524,15 +550,77 @@ func (p proj) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (p proj) View() string{
 	//resumeString:=
 
-	projMDRender := p.styles.stackBodyText.Width(p.width -4).Render(p.projRenderer)
-	stackPageNav := "\n\n\n [Q] Quit  |  [H] Home"
-	navRender := p.styles.stackBodyText.Render(stackPageNav)
+	projTitle := `   ___           _           _       
+  / _ \_ __ ___ (_) ___  ___| |_ ___ 
+ / /_)/ '__/ _ \| |/ _ \/ __| __/ __|
+/ ___/| | | (_) | |  __/ (__| |_\__ \
+\/    |_|  \___// |\___|\___|\__|___/
+              |__/                   `
+	projTitleRendered := p.styles.StackStyle.Align(lipgloss.Top, lipgloss.Center).Render(projTitle)
+	projMDRender := p.styles.stackBodyText.Width(p.width - 4).Render(p.projRenderer)
+	projNav := "[Q] Quit | [H] Home"
+	//projMDRender := p.styles.StackStyle.Width(p.width).Render(p.projRenderer)
+	navRender := p.styles.stackBodyText.Render(projNav)
 	return lipgloss.Place(
 		p.width,
 		p.height,
 		lipgloss.Center,
 		lipgloss.Top,
-		lipgloss.JoinVertical(lipgloss.Center, projMDRender, navRender),
+		lipgloss.JoinVertical(lipgloss.Center, projTitleRendered, projMDRender, navRender),	)
+}
+
+
+
+type exp struct{
+	width      int
+	height     int
+	res  []string
+	styles     *Styles
+	expRenderer string
+}
+
+func (e exp) Init() tea.Cmd{
+	return nil
+}
+
+func (e exp) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+
+	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		switch msg.String() {
+		case "q":
+			return e, tea.Quit
+		}
+	case tea.WindowSizeMsg:
+		e.width = msg.Width
+		e.height = msg.Height
+		
+	}
+
+	return e, nil
+}
+
+
+func (e exp) View() string{
+	//resumeString:=
+
+	expTitle := `   __                      _                      __ __  
+  /__\_  ___ __   ___ _ __(_) ___ _ __   ___ ___ / /_\ \ 
+ /_\ \ \/ / '_ \ / _ \ '__| |/ _ \ '_ \ / __/ _ \ / __| |
+//__  >  <| |_) |  __/ |  | |  __/ | | | (_|  __/ \__ \ |
+\__/ /_/\_\ .__/ \___|_|  |_|\___|_| |_|\___\___| |___/ |
+          |_|                                    \_\ /_/ `
+	expTitleRendered := e.styles.StackStyle.Align(lipgloss.Top, lipgloss.Center).Render(expTitle)
+	expMDRender := e.styles.stackBodyText.Width(e.width - 4).Render(e.expRenderer)
+	projNav := "[Q] Quit | [H] Home"
+	//projMDRender := p.styles.StackStyle.Width(p.width).Render(p.projRenderer)
+	navRender := e.styles.stackBodyText.Render(projNav)
+	return lipgloss.Place(
+		e.width,
+		e.height,
+		lipgloss.Center,
+		lipgloss.Top,
+		lipgloss.JoinVertical(lipgloss.Center, expTitleRendered, expMDRender, navRender),
 	)
 }
 
@@ -556,8 +644,7 @@ func (p proj) View() string{
 
 
 
-
-//go:embed  mds/*
+//go:embed  Stack.md proj.md Exp.md
 var f embed.FS
 
 func readStackMD(filename string) string {
