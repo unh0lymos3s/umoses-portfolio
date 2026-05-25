@@ -3,11 +3,13 @@ package main
 import (
 	"bytes"
 	"embed"
+	"net/http"
 	"fmt"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/glamour"
 	"github.com/charmbracelet/lipgloss"
 	"os"
+	"log"
 	// "github.com/charmbracelet/colorprofile"
 	// bubbles "github.com/charmbracelet/bubbles"
 	// harmonica "github.com/charmbracelet/harmonica"
@@ -29,12 +31,24 @@ const (
 
 func main() {
 	//initialStack := []string{"Go", "Rust", "Python"}
-	p := tea.NewProgram(initialModel())
+	filesys := http.FileServer(http.Dir("./public"))
 
+	go func(){
+		log.Println("HTTP running on  8080")
+		if err := http.ListenAndServe(":8080", filesys); err != nil{
+			log.Fatalf("http server: %v", err)
+		}
+	}()
+
+
+	p := tea.NewProgram(initialModel())
+	
 	if _, err := p.Run(); err != nil {
 		fmt.Printf("There been an error %v", err)
 		os.Exit(1)
 	}
+
+		
 }
 
 type Styles struct {
@@ -513,6 +527,11 @@ func (r resume) View() string{
                                      `
 	resTitleRendered := r.styles.StackStyle.Align(lipgloss.Top, lipgloss.Center).Render(resTitle)
 	resBody := "Click on the link to download my resume."
+	reslink := "http://0.0.0.0:8080/resume.pdf"
+	resText := "Link :["
+	resBody += fmt.Sprintf("\t | \t \x1b]8;;%s\x1b\\%s\x1b]8;;\x1b\\", reslink, resText) 
+	
+
 	resBodyRendered := r.styles.aboutStrings.Width(0).Render(resBody)
 	stackPageNav := "\n\n\n [Q] Quit  |  [H] Home"
 	navRender := r.styles.stackBodyText.Render(stackPageNav)
