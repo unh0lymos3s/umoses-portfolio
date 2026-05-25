@@ -111,7 +111,7 @@ func initialAbout() about {
 func initialResume() resume{
 	return resume{
 		styles: DefaultStyles(),
-		resumeRenderer: readStackMD("Resume.md"),
+		
 	}
 }
 
@@ -149,6 +149,8 @@ func (m home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.proj.height = msg.Height
 		m.exp.width = msg.Width
 		m.exp.height = msg.Height
+		m.resume.width = msg.Width
+		m.resume.height = msg.Height
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "q":
@@ -503,17 +505,24 @@ func (r resume) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 
 func (r resume) View() string{
-	//resumeString:=
-
-	resumeMDRender := r.styles.stackBodyText.Width(r.width -4).Render(r.resumeRenderer)
+	resTitle:=`   __                                
+  /__\ ___  ___ _   _ _ __ ___   ___ 
+ / \/// _ \/ __| | | | '_ ' _ \ / _ \
+/ _  \  __/\__ \ |_| | | | | | |  __/
+\/ \_/\___||___/\__,_|_| |_| |_|\___|
+                                     `
+	resTitleRendered := r.styles.StackStyle.Align(lipgloss.Top, lipgloss.Center).Render(resTitle)
+	resBody := "Click on the link to download my resume."
+	resBodyRendered := r.styles.aboutStrings.Width(0).Render(resBody)
 	stackPageNav := "\n\n\n [Q] Quit  |  [H] Home"
 	navRender := r.styles.stackBodyText.Render(stackPageNav)
+
 	return lipgloss.Place(
 		r.width,
 		r.height,
 		lipgloss.Center,
 		lipgloss.Top,
-		lipgloss.JoinVertical(lipgloss.Center, resumeMDRender, navRender),
+		lipgloss.JoinVertical(lipgloss.Center, resTitleRendered, resBodyRendered, navRender),
 	)
 }
 
